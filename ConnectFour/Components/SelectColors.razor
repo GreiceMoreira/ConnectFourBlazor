@@ -1,0 +1,36 @@
+<h3>Choose your colors</h3>
+
+<label>Player 1</label>
+<select @bind="Player1Color">
+    @foreach (var color in Colors)
+    {
+        <option value="@color">@color</option>
+    }
+</select>
+
+<label>Player 2</label>
+<select @bind="Player2Color">
+    @foreach (var color in Colors.Where(c => c != Player1Color))
+    {
+        <option value="@color">@color</option>
+    }
+</select>
+
+<button @onclick="ConfirmColors">Start Game</button>
+
+@code {
+    [Parameter] public EventCallback<(string Player1, string Player2)> OnColorsSelected { get; set; }
+
+    private string Player1Color { get; set; } = "Red";
+    private string Player2Color { get; set; } = "Blue";
+
+    private List<string> Colors = new() 
+    { 
+        "Red", "Blue", "Green", "Yellow", "Purple" 
+    };
+
+    private async Task ConfirmColors()
+    {
+        await OnColorsSelected.InvokeAsync((Player1Color, Player2Color));
+    }
+}

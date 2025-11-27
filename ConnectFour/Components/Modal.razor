@@ -1,0 +1,70 @@
+@using System.Xml
+
+@if(Show)
+{
+    <div class="dialog-container">
+        <div class="dialog">
+            <div class="dialog-title">
+                <h2>Choose you color</h2>
+            </div>
+
+            <div class="dialog-body">
+                <div>
+                    <label>Player 1</label>
+                    <select @bind="Player1Color">
+                        <option value="">Select a color</option>
+                        @foreach (var color in Colors.Where(c => c != Player2Color))
+                        {
+                            <option value="@color">@color</option>
+                        }
+                    </select>
+                </div>
+
+                <div>
+                    <label>Player 2</label>
+                    <select @bind="Player2Color">
+                        <option value="">Select a color</option>
+                        @foreach (var color in Colors.Where(c => c != Player1Color))
+                        {
+                            <option value="@color">@color</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="dialog-buttons">
+                <button @onclick="ConfirmSelection">Play Game</button>
+            </div>
+
+        </div>
+    </div>
+}
+
+@code {
+    private string? Player1Color { get; set; }
+    private string? Player2Color { get; set; }
+
+    private List<string> Colors = new()
+    {
+        "Red", "Blue", "Green", "Yellow", "Purple"
+    };
+
+    [Parameter] 
+    public bool Show { get; set; }
+
+    [Parameter] 
+    public EventCallback<bool> ShowChanged { get; set; }
+
+    [Parameter] 
+    public EventCallback<(string player1, string player2)> OnSelection { get; set; }
+    private async Task ConfirmSelection()
+    {
+        var p1 = string.IsNullOrWhiteSpace(Player1Color) ? "Red" : Player1Color;
+        var p2 = string.IsNullOrWhiteSpace(Player2Color) ? "Blue" : Player2Color;
+
+        await OnSelection.InvokeAsync((p1, p2));   
+        await ShowChanged.InvokeAsync(false);
+
+    }
+
+}
